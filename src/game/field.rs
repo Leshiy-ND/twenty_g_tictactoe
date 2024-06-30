@@ -4,27 +4,34 @@ use super::GRID_SIZE;
 
 
 
-// #[derive(Default)]
+#[derive(Default)]
 pub enum FieldTile {
-    // #[default]
+    #[default]
     Empty,
     X,
     O,
 }
 
-// #[derive(Component, Default)]
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Field {
-    pub tiles: [[FieldTile; 3]; 3]
+    pub tiles: [[FieldTile; 3]; 3],
 }
 
-impl Default for Field {
-    fn default() -> Self {
-        Field { tiles: [
-            [FieldTile::X,     FieldTile::O,     FieldTile::Empty],
-            [FieldTile::Empty, FieldTile::Empty, FieldTile::Empty],
-            [FieldTile::Empty, FieldTile::Empty, FieldTile::Empty]
-        ] }
+impl Field {
+    pub fn set_tile_by_cursor(&mut self, position: Vec2, tile: FieldTile) -> Result<(), ()> {
+        let mut x =     (position.x + GRID_SIZE as f32 * 1.5) as usize / GRID_SIZE as usize;
+        let mut y = 2 - (position.y + GRID_SIZE as f32 * 1.5) as usize / GRID_SIZE as usize;
+
+        x = x.max(0).min(2);
+        y = y.max(0).min(2);
+
+        match self.tiles[y][x] {
+            FieldTile::Empty => {
+                self.tiles[y][x] = tile;
+                return Ok(());
+            },
+            _ => return Err(()),
+        }
     }
 }
 
