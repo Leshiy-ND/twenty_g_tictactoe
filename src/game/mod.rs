@@ -7,7 +7,7 @@ mod cursor_position;
 use cursor_position::CursorPositionPlugin;
 
 mod field;
-use field::*;
+use field::FieldPlugin;
 
 mod players;
 use players::PlayersPlugin;
@@ -21,14 +21,11 @@ impl Plugin for TheGamePlugin {
         app
             // Plugins
             .add_plugins(CursorPositionPlugin)
+            .add_plugins(FieldPlugin)
             .add_plugins(PlayersPlugin)
 
             // Startup systems
             .add_systems(Startup, spawn_camera)
-            .add_systems(Startup, new_game)
-
-            // Update systems
-            .add_systems(Update, draw_field)
 
             // End
             ;
@@ -41,12 +38,4 @@ fn spawn_camera(
     mut commands: Commands
 ) {
     commands.spawn(Camera2dBundle::default());
-}
-
-
-
-fn new_game(
-    mut commands: Commands
-) {
-    commands.spawn( Field::default() );
 }

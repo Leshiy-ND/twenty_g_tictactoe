@@ -3,7 +3,8 @@ use std::borrow::Borrow;
 use bevy::prelude::*;
 use rand::prelude::random;
 
-use super::{cursor_position::CursorPositon, Field, FieldTile};
+use super::cursor_position::CursorPositon;
+use super::field::{Field, FieldTile};
 
 
 
@@ -49,13 +50,9 @@ pub fn process_player_turn(
     mouse_input: Res<ButtonInput<MouseButton>>,
     cursor_position: Res<CursorPositon>,
     mut players: ResMut<Players>,
+    mut field: ResMut<Field>,
     time: Res<Time>,
-
-    mut q_field: Query<&mut Field>,
 ) {
-    if let Err(_) = q_field.get_single() { return; }
-    let mut field = q_field.single_mut();
-
     let current_player = if players.turn_of_x {players.player_x.borrow()} else {players.player_o.borrow()};
     #[allow(unused_assignments)]
     let mut made_turn = false;

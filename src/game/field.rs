@@ -4,6 +4,24 @@ use super::GRID_SIZE;
 
 
 
+pub struct FieldPlugin;
+
+impl Plugin for FieldPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            // Resources
+            .init_resource::<Field>() 
+
+            // Update systems
+            .add_systems(PostUpdate, draw_field)
+
+            // End
+            ;
+    }
+}
+
+
+
 #[derive(Default)]
 pub enum FieldTile {
     #[default]
@@ -12,7 +30,7 @@ pub enum FieldTile {
     O,
 }
 
-#[derive(Component, Default)]
+#[derive(Resource, Default)]
 pub struct Field {
     pub tiles: [[FieldTile; 3]; 3],
 }
@@ -39,11 +57,8 @@ impl Field {
 
 pub fn draw_field(
     mut gizmos: Gizmos,
-    field_query: Query<&Field>,
+    field: Res<Field>,
 ) {
-    if let Err(_) = field_query.get_single() { return; }
-    let field = field_query.single();
-
     let (mut x, mut y);
 
     (x, y) = (-(GRID_SIZE as f32 * 0.5), -(GRID_SIZE as f32 * 1.5));
