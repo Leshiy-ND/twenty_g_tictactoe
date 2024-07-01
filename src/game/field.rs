@@ -37,8 +37,16 @@ pub enum FieldTile {
     O,
 }
 
-#[derive(Event)]
-struct EndGameEvent(FieldTile);
+impl FieldTile {
+    pub fn is_about_to_be_closed(tiles: [FieldTile; 3]) -> Result<(usize, FieldTile), ()> {
+        if tiles[0] != FieldTile::Empty && tiles[0] == tiles[1] && tiles[2] == FieldTile::Empty { return Ok( (2, tiles[0]) ); }
+        if tiles[0] != FieldTile::Empty && tiles[0] == tiles[2] && tiles[1] == FieldTile::Empty { return Ok( (1, tiles[0]) ); }
+        if tiles[1] != FieldTile::Empty && tiles[1] == tiles[2] && tiles[0] == FieldTile::Empty { return Ok( (0, tiles[1]) ); }
+        Err(())
+    }
+}
+
+
 
 #[derive(Resource, Default)]
 pub struct Field {
@@ -47,17 +55,19 @@ pub struct Field {
 }
 
 impl Field {
-    pub fn set_tile(&mut self, y: usize, x: usize, tile: FieldTile) -> Result<(), ()> {
-        if let Some(_) = self.end_game_option { return Err(()); }
-        if x.max(y) > 2 { panic!(); }
-
-        match self.tiles[y][x] {
-            FieldTile::Empty => {
-                self.tiles[y][x] = tile;
-                return Ok(());
-            },
-            _ => return Err(()),
+    pub fn is_finished(&self) -> bool {
+        match self.end_game_option {
+            Some(_) => true,
+            None    => false,
         }
+    }
+
+    pub fn get_tile(&self, y: u32, x: u32) -> FieldTile {
+        self.tiles[y as usize][x as usize]
+    }
+
+    pub fn set_tile(&mut self, y: u32, x: u32, tile: FieldTile) {
+        self.tiles[y as usize][x as usize] = tile;
     }
 
     pub fn set_tile_by_cursor(&mut self, position: Vec2, tile: FieldTile) -> Result<(), ()> {
@@ -77,11 +87,26 @@ impl Field {
     }
 }
 
+
+
+#[derive(Event)]
+struct EndGameEvent(FieldTile);
+
+fn end_game(
+    mut end_game_event: EventReader<EndGameEvent>,
+    mut field: ResMut<Field>,
+) {
+    for event in end_game_event.read() {
+        field.end_game_option = Some(event.0);
+    }
+}
+
 fn chech_field(
     mut end_game_event: EventWriter<EndGameEvent>,
     field: Res<Field>,
 ) {
     if !field.is_changed() { return; }
+
     let ending = {
         let mut full = true;
 
@@ -101,51 +126,42 @@ fn chech_field(
     };
 
     for line in field.tiles.iter() {
-        let first_tile = line.get(0).unwrap();
-        if *first_tile == FieldTile::Empty { break; }
-        if first_tile != line.get(1).unwrap() { break; }
-        if first_tile != line.get(2).unwrap() { break; }
-        end_game_event.send(EndGameEvent(*first_tile));
+        let first_tile = line[0];
+        if first_tile == FieldTile::Empty { continue; }
+        if first_tile != line[1]          { continue; }
+        if first_tile != line[2]          { continue; }
+        end_game_event.send(EndGameEvent(first_tile));
         return;
     }
     for x in 0..3 {
         let first_tile = field.tiles[0][x];
-        if first_tile == FieldTile::Empty  { break; }
-        if first_tile != field.tiles[1][x] { break; }
-        if first_tile != field.tiles[2][x] { break; }
+        if first_tile == FieldTile::Empty  { continue; }
+        if first_tile != field.tiles[1][x] { continue; }
+        if first_tile != field.tiles[2][x] { continue; }
         end_game_event.send(EndGameEvent(first_tile));
         return;
     }
-    for _ in 0..1 {
+    loop {
         let center_tile = field.tiles[1][1];
-        if center_tile == FieldTile::Empty  { break; }
+        if center_tile == FieldTile::Empty { break; }
         
-        for _ in 0..1 {
+        loop {
             if center_tile != field.tiles[0][0] { break; }
             if center_tile != field.tiles[2][2] { break; }
             end_game_event.send(EndGameEvent(center_tile));
             return;
         }
-        for _ in 0..1 {
+        loop {
             if center_tile != field.tiles[0][2] { break; }
             if center_tile != field.tiles[2][0] { break; }
             end_game_event.send(EndGameEvent(center_tile));
             return;
         }
+        break;
     }
     
     if ending {
         end_game_event.send(EndGameEvent(FieldTile::Empty));
-    }
-}
-
-fn end_game(
-    mut end_game_event: EventReader<EndGameEvent>,
-    mut field: ResMut<Field>,
-) {
-    for event in end_game_event.read() {
-        field.end_game_option = Some(event.0);
-        return;
     }
 }
 
