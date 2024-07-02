@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::AppState;
+
 use super::GRID_SIZE;
 
 
@@ -16,11 +18,17 @@ impl Plugin for FieldPlugin {
             .init_resource::<Field>() 
 
             // Update systems
-            .add_systems(Update, chech_field)
-            .add_systems(Update, end_game)
+            .add_systems(Update, (
+                    chech_field,
+                    end_game,
+                )
+                .run_if(in_state(AppState::InGame))
+            )
 
             // PostUpdate systems
-            .add_systems(PostUpdate, draw_field)
+            .add_systems(PostUpdate, draw_field
+                .run_if(in_state(AppState::InGame))
+            )
 
             // End
             ;

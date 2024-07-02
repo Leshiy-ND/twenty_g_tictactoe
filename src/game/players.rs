@@ -3,6 +3,8 @@ use std::borrow::Borrow;
 use bevy::prelude::*;
 use rand::random;
 
+use crate::AppState;
+
 use super::cursor_position::CursorPositon;
 use super::field::{Field, FieldTile};
 
@@ -22,7 +24,9 @@ impl Plugin for PlayersPlugin {
             }) 
 
             // Update systems
-            .add_systems(PreUpdate, process_player_turn)
+            .add_systems(PreUpdate, process_player_turn
+                .run_if(in_state(AppState::InGame))
+            )
 
             // End
             ;
@@ -34,14 +38,14 @@ impl Plugin for PlayersPlugin {
 #[derive(Resource)]
 pub struct Players {
     turn_of_x: bool,
-    player_x: Player,
-    player_o: Player,
+    pub player_x: Player,
+    pub player_o: Player,
     npc_thinking_timer: f32,
 }
 
 #[derive(Component)]
 pub struct Player {
-    is_real: bool
+    pub is_real: bool
 }
 
 

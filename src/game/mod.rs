@@ -9,7 +9,7 @@ use cursor_position::CursorPositionPlugin;
 mod field;
 use field::FieldPlugin;
 
-mod players;
+pub mod players;
 use players::PlayersPlugin;
 
 

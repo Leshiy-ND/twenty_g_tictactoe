@@ -4,10 +4,16 @@ mod game;
 use game::TheGamePlugin;
 use game::common::GRID_SIZE;
 
+mod main_menu;
+use main_menu::MainMenuPlugin;
+
 
 
 fn main() {
     App::new()
+        // States
+        .init_state::<AppState>()
+
         // Plugins
         .add_plugins((
             DefaultPlugins
@@ -24,8 +30,18 @@ fn main() {
                     ..default()
                 }),
             TheGamePlugin,
+            MainMenuPlugin
         ))
 
         // Run
         .run();
+}
+
+
+
+#[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    InGame,
 }
