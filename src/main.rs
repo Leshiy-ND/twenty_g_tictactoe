@@ -7,6 +7,9 @@ use game::common::GRID_SIZE;
 mod main_menu;
 use main_menu::MainMenuPlugin;
 
+mod ingame_ui;
+use ingame_ui::IngameUiPlugin;
+
 
 
 fn main() {
@@ -30,6 +33,7 @@ fn main() {
                     ..default()
                 }),
             TheGamePlugin,
+            IngameUiPlugin,
             MainMenuPlugin
         ))
 

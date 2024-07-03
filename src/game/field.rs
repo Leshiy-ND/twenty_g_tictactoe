@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-use super::GRID_SIZE;
+use super::{score::Score, GRID_SIZE};
 
 
 
@@ -15,9 +15,12 @@ impl Plugin for FieldPlugin {
             .add_event::<EndGameEvent>() 
 
             // Resources
-            .init_resource::<Field>() 
+            .init_resource::<Field>()
 
-            // Update systems
+            // State Systems
+            .add_systems(OnExit(AppState::InGame), clear_field)
+
+            // Update Systems
             .add_systems(Update, (
                     chech_field,
                     end_game,
@@ -25,7 +28,7 @@ impl Plugin for FieldPlugin {
                 .run_if(in_state(AppState::InGame))
             )
 
-            // PostUpdate systems
+            // PostUpdate Systems
             .add_systems(PostUpdate, draw_field
                 .run_if(in_state(AppState::InGame))
             )
@@ -93,6 +96,15 @@ impl Field {
             _ => return Err(()),
         }
     }
+
+    pub fn clear(&mut self) {
+        for line in self.tiles.iter_mut() {
+            for tile in line.iter_mut() {
+                *tile = FieldTile::Empty;
+            }
+        }
+        self.end_game_option = None;
+    }
 }
 
 
@@ -100,12 +112,24 @@ impl Field {
 #[derive(Event)]
 struct EndGameEvent(FieldTile);
 
+fn clear_field(
+    mut field: ResMut<Field>,
+) {
+    field.clear();
+}
+
 fn end_game(
     mut end_game_event: EventReader<EndGameEvent>,
     mut field: ResMut<Field>,
+    mut score: ResMut<Score>,
 ) {
     for event in end_game_event.read() {
         field.end_game_option = Some(event.0);
+        match event.0 {
+            FieldTile::Empty => score.draws += 1,
+            FieldTile::X     => score.x     += 1,
+            FieldTile::O     => score.o     += 1,
+        }
     }
 }
 
@@ -113,6 +137,7 @@ fn chech_field(
     mut end_game_event: EventWriter<EndGameEvent>,
     field: Res<Field>,
 ) {
+    if field.is_finished() { return; }
     if !field.is_changed() { return; }
 
     let ending = {

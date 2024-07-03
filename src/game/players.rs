@@ -1,6 +1,7 @@
 use std::borrow::Borrow;
 
 use bevy::prelude::*;
+use bevy::time::Stopwatch;
 use rand::random;
 
 use crate::AppState;
@@ -20,8 +21,12 @@ impl Plugin for PlayersPlugin {
                 turn_of_x: true,
                 player_x: Player { is_real: false },
                 player_o: Player { is_real: true  },
-                npc_thinking_timer: 2.0
+                npc_thinking_timer: 2.0,
+                timer: Stopwatch::new()
             }) 
+
+            // State Systems
+            .add_systems(OnEnter(AppState::InGame), clear_players)
 
             // Update systems
             .add_systems(PreUpdate, process_player_turn
@@ -37,18 +42,33 @@ impl Plugin for PlayersPlugin {
 
 #[derive(Resource)]
 pub struct Players {
-    turn_of_x: bool,
+    pub turn_of_x: bool,
     pub player_x: Player,
     pub player_o: Player,
     npc_thinking_timer: f32,
+    timer: Stopwatch,
+}
+
+impl Players {
+    pub fn get_timer_str(&self) -> String {
+        let secs = self.timer.elapsed_secs() as u32;
+        format!("{:0>2}:{:0>2}", secs / 60, secs % 60)
+    }
 }
 
 #[derive(Component)]
 pub struct Player {
-    pub is_real: bool
+    pub is_real: bool,
 }
 
 
+
+pub fn clear_players(
+    mut players: ResMut<Players>,
+) {
+    players.turn_of_x = true;
+    players.timer.reset();
+}
 
 pub fn process_player_turn(
     mouse_input: Res<ButtonInput<MouseButton>>,
@@ -57,6 +77,7 @@ pub fn process_player_turn(
     mut field: ResMut<Field>,
     time: Res<Time>,
 ) {
+    players.timer.tick(time.delta());
     if field.is_finished() { return; }
 
     let current_player = if players.turn_of_x {players.player_x.borrow()} else {players.player_o.borrow()};

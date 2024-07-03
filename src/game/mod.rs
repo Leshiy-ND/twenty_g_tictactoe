@@ -6,11 +6,14 @@ use common::*;
 mod cursor_position;
 use cursor_position::CursorPositionPlugin;
 
-mod field;
+pub mod field;
 use field::FieldPlugin;
 
 pub mod players;
 use players::PlayersPlugin;
+
+pub mod score;
+use score::ScorePlugin;
 
 
 
@@ -23,6 +26,7 @@ impl Plugin for TheGamePlugin {
             .add_plugins(CursorPositionPlugin)
             .add_plugins(FieldPlugin)
             .add_plugins(PlayersPlugin)
+            .add_plugins(ScorePlugin)
 
             // Startup systems
             .add_systems(Startup, spawn_camera)
