@@ -43,13 +43,10 @@ fn spawn_credit_planks(
         root.spawn(
             NodeBundle {
                 style: Style {
-                    // top:    Val::Vh(-50.0),
-                    // right:  Val::Px(0.0),
                     top:    Val::Px((window_height - credit_plank_h) / 2.0),
                     left:   Val::Px(credit_plank_h / 2.0 - window_height),
                     width:  Val::Percent(200.0),
                     height: Val::Px(credit_plank_h),
-                    // bottom: Val::Percent(100.0),
                     justify_content: JustifyContent::Center,
                     align_items:         AlignItems::Center,
                     position_type:     PositionType::Absolute,
@@ -68,7 +65,7 @@ fn spawn_credit_planks(
                         "Leshiy_ND * Bevy 0.13 * Leshiy_ND * Bevy 0.13 * Leshiy_ND",
                         TextStyle {
                             font_size: credit_plank_h * 0.66,
-                            color: Color::GRAY.with_a(0.5),
+                            color: Color::GRAY.with_a(0.33),
                             ..default()
                         }
                     ),
@@ -80,13 +77,10 @@ fn spawn_credit_planks(
         root.spawn(
             NodeBundle {
                 style: Style {
-                    // top:    Val::Vh(-50.0),
-                    // right:  Val::Px(0.0),
                     top:    Val::Px((window_height - credit_plank_h) / 2.0),
                     left:   Val::Px(- credit_plank_h / 2.0),
                     width:  Val::Percent(200.0),
                     height: Val::Px(credit_plank_h),
-                    // bottom: Val::Percent(100.0),
                     justify_content: JustifyContent::Center,
                     align_items:         AlignItems::Center,
                     position_type:     PositionType::Absolute,
@@ -105,7 +99,7 @@ fn spawn_credit_planks(
                         "Leshiy_ND * Bevy 0.13 * Leshiy_ND * Bevy 0.13 * Leshiy_ND",
                         TextStyle {
                             font_size: credit_plank_h * 0.66,
-                            color: Color::GRAY.with_a(0.5),
+                            color: Color::GRAY.with_a(0.33),
                             ..default()
                         }
                     ),
