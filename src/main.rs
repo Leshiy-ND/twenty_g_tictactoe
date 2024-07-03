@@ -10,6 +10,9 @@ use main_menu::MainMenuPlugin;
 mod ingame_ui;
 use ingame_ui::IngameUiPlugin;
 
+mod credit_planks;
+use credit_planks::CreditPlanksPlugin;
+
 
 
 fn main() {
@@ -32,6 +35,7 @@ fn main() {
                     ),
                     ..default()
                 }),
+            CreditPlanksPlugin,
             TheGamePlugin,
             IngameUiPlugin,
             MainMenuPlugin
