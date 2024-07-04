@@ -1,4 +1,4 @@
-# Twenty G - tic-Tac-Toe
+# Twenty G - Tic-Tac-Toe
 
 
 
